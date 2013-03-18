@@ -3,11 +3,11 @@ Ping Forever
 Run a ping command as daemon.
 
 Dependencies
-============
+------------
   * *daemonize*
 
 Usage
-=====
+-----
     # sudo yum install daemonize
 
     # mkdir -p /opt/local/
@@ -34,5 +34,5 @@ Usage
     # ./bin/match.sh www.google.com.tw "2013/03/18 15:20:10"
 
 Author
-======
+------
     SHIE, Li-Yi <lyshie@mx.nthu.edu.tw>
