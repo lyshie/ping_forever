@@ -4,7 +4,7 @@ Run a ping command as daemon.
 
 Dependencies
 ============
-  * daemonize
+  * *daemonize*
 
 Usage
 =====
@@ -31,7 +31,7 @@ Usage
     Mon Mar 18 15:36:06 2013 (ping: sendmsg: Network is unreachable)
     Mon Mar 18 15:36:07 2013 (ping: sendmsg: Network is unreachable)
 
-    # ./bin/match www.google.com.tw "2013/03/18 15:20:10"
+    # ./bin/match.sh www.google.com.tw "2013/03/18 15:20:10"
 
 Author
 ======
