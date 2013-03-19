@@ -1,11 +1,13 @@
 /opt/local/ping_forever/log/*.log {
-    rotate 7
-    daily
-    compress
+#    rotate 7
+#    daily
+#    compress
+	size 10M
     sharedscripts
     postrotate
-        /opt/local/ping_forever/bin/pf.sh www.google.com >/dev/null 2>/dev/null || true
-        /opt/local/ping_forever/bin/pf.sh 168.95.1.1     >/dev/null 2>/dev/null || true
+        /opt/local/ping_forever/bin/pf.sh www.google.com   >/dev/null 2>/dev/null || true
+        /opt/local/ping_forever/bin/pf.sh www.facebook.com >/dev/null 2>/dev/null || true
+        /opt/local/ping_forever/bin/pf.sh 168.95.1.1       >/dev/null 2>/dev/null || true
     endscript
     missingok
 }
