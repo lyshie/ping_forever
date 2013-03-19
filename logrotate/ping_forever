@@ -2,7 +2,7 @@
 #    rotate 7
 #    daily
 #    compress
-	size 10M
+    size 10M
     sharedscripts
     postrotate
         /opt/local/ping_forever/bin/pf.sh www.google.com   >/dev/null 2>/dev/null || true
