@@ -33,6 +33,14 @@ Usage
 
     # ./bin/match.sh www.google.com.tw "2013/03/18 15:20:10"
 
+    # ./bin/missing.pl www.facebook.com
+    (Thu Mar 21 01:05:13 2013) 22258 <=> 22260 (Thu Mar 21 01:05:15 2013),  2
+    (Thu Mar 21 01:05:23 2013) 22268 <=> 22456 (Thu Mar 21 01:08:31 2013),  188
+    (Thu Mar 21 01:09:21 2013) 22506 <=> 22508 (Thu Mar 21 01:09:23 2013),  2
+    (Thu Mar 21 01:09:55 2013) 22540 <=> 22542 (Thu Mar 21 01:09:57 2013),  2
+    (Thu Mar 21 01:09:59 2013) 22544 <=> 22696 (Thu Mar 21 01:12:31 2013),  152
+    (Thu Mar 21 01:12:31 2013) 22696 <=> 22698 (Thu Mar 21 01:12:33 2013),  2
+
 Author
 ------
     SHIE, Li-Yi <lyshie@mx.nthu.edu.tw>
