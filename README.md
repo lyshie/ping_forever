@@ -41,6 +41,8 @@ Usage
     (Thu Mar 21 01:09:59 2013) 22544 <=> 22696 (Thu Mar 21 01:12:31 2013),  152
     (Thu Mar 21 01:12:31 2013) 22696 <=> 22698 (Thu Mar 21 01:12:33 2013),  2
 
+    # ./bin/curses_log.pl www.google.com
+
 Author
 ------
     SHIE, Li-Yi <lyshie@mx.nthu.edu.tw>
