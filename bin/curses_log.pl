@@ -26,6 +26,7 @@ use Curses::UI::POE;
 use FindBin qw($Bin);
 use Digest::MD5 qw(md5_hex);
 use File::Basename;
+use Clipboard;
 
 # resolve hostname and log filename
 my $HASHED      = md5_hex( $ARGV[0] || die('ERROR: No given hostname') );
@@ -39,16 +40,17 @@ my $ui;            # Curses::UI
 my $poe_timer;     # POE timer session
 my $poe_tailor;    # POE tailor session
 my $interval = 3;  # tailor polling interval
+my $is_clip  = 1;
 
-my @current = ();  # buffer current ping logs
-my @history = ();  # buffer history logs
+my @current = ();    # buffer current ping logs
+my @history = ();    # buffer history logs
 
-my $now    = time();    # FIXME: bad global var should be stored in $_[HEAP]
-my $prev   = 0;         # FIXME: bad global var should be stored in $_[HEAP]
-my $p_time = 0;         # FIXME: bad global var should be stored in $_[HEAP]
+my $now    = time(); # FIXME: bad global var should be stored in $_[HEAP]
+my $prev   = 0;      # FIXME: bad global var should be stored in $_[HEAP]
+my $p_time = 0;      # FIXME: bad global var should be stored in $_[HEAP]
 
 my $who_focus =
-  'win_current';        # change focus between 'win_current' and 'win_history'
+  'win_current';     # change focus between 'win_current' and 'win_history'
 
 sub init_ui {
     $ui = Curses::UI::POE->new(
@@ -141,22 +143,32 @@ sub init_ui {
     );
 
     # current list
-    my $listbox_current = $win_current->add(
+    my $listbox_current;
+    $listbox_current = $win_current->add(
         'listbox_current', 'Listbox', qw(
           -y 0
           -height -1
           -width -1
           ),
+        -onselchange,
+        sub {
+            copy_to_clipboard($listbox_current);
+        }
     );
     $listbox_current->clear_binding('loose-focus');
 
     # history list
-    my $listbox_history = $win_history->add(
+    my $listbox_history;
+    $listbox_history = $win_history->add(
         'listbox_history', 'Listbox', qw(
           -y 0
           -height -1
           -width -1
           ),
+        -onselchange,
+        sub {
+            copy_to_clipboard($listbox_history);
+        }
     );
     $listbox_history->clear_binding('loose-focus');
 
@@ -164,6 +176,21 @@ sub init_ui {
     $listbox_history->focus();
 
     $win->draw();
+}
+
+sub copy_to_clipboard {
+    return if ( !defined($is_clip) );
+
+    my ($listbox) = @_;
+    my $select;
+    ($select) = $listbox->get();
+    eval { Clipboard->copy($select) if ( defined($select) ); };
+
+    if ($@)
+    {  # FIXME: remote copy isn't supported => Error: Can't open display: (null)
+        $is_clip = 0;
+        draw_ui();
+    }
 }
 
 # unused
