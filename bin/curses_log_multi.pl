@@ -169,6 +169,12 @@ sub init_ui {
         -onchange,
         sub {
             copy_to_clipboard($listbox_current);
+            my $select;
+            ($select) = $listbox_current->get();
+            if ( defined($select) && $select =~ m/^\[(\d+)\.\d+\]\s/ ) {
+                my $time = scalar( localtime($1) );
+                $win_current->title("Current ($time)");
+            }
         }
     );
     $listbox_current->clear_binding('loose-focus');
