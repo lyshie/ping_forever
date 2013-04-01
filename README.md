@@ -58,3 +58,7 @@ Screentshots
 Author
 ------
     SHIE, Li-Yi <lyshie@mx.nthu.edu.tw>
+
+License
+-------
+    GNU General Public License (GPL)
