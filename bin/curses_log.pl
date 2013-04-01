@@ -95,7 +95,7 @@ sub init_ui {
     my $label_help = $win->add(
         'label_help', 'Label',
         -text =>
-'[Q]uit  [TAB] Switch Window  [Up/Down] Select entry  [+/-] Inc/Decrese time  [A]bout',
+'[Q]uit  [TAB] Switch window  [Up/Down] Select entry  [+/-] Inc/Decrease time  [A]bout',
         qw(
           -y 0
           -height 1
