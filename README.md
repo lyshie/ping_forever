@@ -51,6 +51,10 @@ Usage
 
     # ./bin/curses_log.pl www.google.com
 
+Screentshots
+------------
+![curses_log.pl](img/curses_log.png)
+
 Author
 ------
     SHIE, Li-Yi <lyshie@mx.nthu.edu.tw>
