@@ -5,6 +5,14 @@ Run a ping command as daemon.
 Dependencies
 ------------
   * *daemonize*
+  * Perl modules
+    - POE (Perl Object Environment)
+    - POE::Wheel::FollowTail
+    - Curses::UI::POE
+    - Curses::UI (UI framework)
+    - Clipboard (Copy text)
+    - Digest::MD5
+    - File::Basename
 
 Usage
 -----
