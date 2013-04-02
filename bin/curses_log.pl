@@ -36,52 +36,52 @@ my $PF_LOG_FILE = "$PF_LOG_PATH/$HASHED.log";
 
 $| = 1;
 
-my $ui;            # Curses::UI
-my $poe_timer;     # POE timer session
-my $poe_tailor;    # POE tailor session
-my $interval = 3;  # tailor polling interval
-my $is_clip  = 1;
+my $UI;            # Curses::UI
+my $POE_TIMER;     # POE timer session
+my $POE_TAILOR;    # POE tailor session
+my $INTERVAL = 3;  # tailor polling INTERVAL
+my $IS_CLIP  = 1;
 
-my @current = ();    # buffer current ping logs
-my @history = ();    # buffer history logs
+my @CURRENT = ();    # buffer current ping logs
+my @HISTORY = ();    # buffer history logs
 
-my $now    = time(); # FIXME: bad global var should be stored in $_[HEAP]
-my $prev   = 0;      # FIXME: bad global var should be stored in $_[HEAP]
-my $p_time = 0;      # FIXME: bad global var should be stored in $_[HEAP]
+my $NOW      = time();    # FIXME: bad global var should be stored in $_[HEAP]
+my $PREV_SEQ = 0;         # FIXME: bad global var should be stored in $_[HEAP]
+my $P_TIME   = 0;         # FIXME: bad global var should be stored in $_[HEAP]
 
-my $who_focus =
-  'win_current';     # change focus between 'win_current' and 'win_history'
+my $WHO_FOCUS =
+  'win_current';          # change focus between 'win_current' and 'win_history'
 
 sub init_ui {
-    $ui = Curses::UI::POE->new(
+    $UI = Curses::UI::POE->new(
         -clear_on_exit => 1,
         -color_support => 1,
         -mouse_support => 0,
     );
 
     # lyshie_20130329: shortcut/key bindings
-    $ui->set_binding(
+    $UI->set_binding(
         sub {
-            $interval++;
-            $interval = 300 if ( $interval > 300 );
-            $poe_kernel->call( $poe_tailor, 'reset' );
+            $INTERVAL++;
+            $INTERVAL = 300 if ( $INTERVAL > 300 );
+            $poe_kernel->call( $POE_TAILOR, 'reset' );
         },
         '+'
     );
-    $ui->set_binding(
+    $UI->set_binding(
         sub {
-            $interval--;
-            $interval = 1 if ( $interval < 1 );
-            $poe_kernel->call( $poe_tailor, 'reset' );
+            $INTERVAL--;
+            $INTERVAL = 1 if ( $INTERVAL < 1 );
+            $poe_kernel->call( $POE_TAILOR, 'reset' );
         },
         '-'
     );
-    $ui->set_binding( sub { exit(0); },                          'q' );
-    $ui->set_binding( sub { $ui->getobj($who_focus)->focus(); }, "\t" );
-    $ui->set_binding( sub { show_about(); },                     "a" );
+    $UI->set_binding( sub { exit(0); },                          'q' );
+    $UI->set_binding( sub { $UI->getobj($WHO_FOCUS)->focus(); }, "\t" );
+    $UI->set_binding( sub { show_about(); },                     "a" );
 
     # lyshie_20130329: default UI layout and draw
-    my $win = $ui->add(
+    my $win = $UI->add(
         'win_main', 'Window',
         -title => 'Realtime Ping Check Monitor',
         qw(
@@ -117,10 +117,10 @@ sub init_ui {
     );
 
     # current window
-    my $win_current = $ui->add(
+    my $win_current = $UI->add(
         'win_current', 'Window',
         -title   => 'Current',
-        -onfocus => sub { $who_focus = 'win_history' },
+        -onfocus => sub { $WHO_FOCUS = 'win_history' },
         qw(
           -border 1
           -y 2
@@ -130,10 +130,10 @@ sub init_ui {
     );
 
     # history window
-    my $win_history = $ui->add(
+    my $win_history = $UI->add(
         'win_history', 'Window',
         -title   => 'History',
-        -onfocus => sub { $who_focus = 'win_current' },
+        -onfocus => sub { $WHO_FOCUS = 'win_current' },
         qw(
           -border 1
           -y 17
@@ -150,7 +150,7 @@ sub init_ui {
           -height -1
           -width -1
           ),
-        -onselchange,
+        -onchange,
         sub {
             copy_to_clipboard($listbox_current);
         }
@@ -165,7 +165,7 @@ sub init_ui {
           -height -1
           -width -1
           ),
-        -onselchange,
+        -onchange,
         sub {
             copy_to_clipboard($listbox_history);
         }
@@ -179,7 +179,7 @@ sub init_ui {
 }
 
 sub copy_to_clipboard {
-    return if ( !defined($is_clip) );
+    return if ( !defined($IS_CLIP) );
 
     my ($listbox) = @_;
     my $select;
@@ -188,16 +188,16 @@ sub copy_to_clipboard {
 
     if ($@)
     {  # FIXME: remote copy isn't supported => Error: Can't open display: (null)
-        $is_clip = 0;
+        $IS_CLIP = 0;
         draw_ui();
     }
 }
 
 # unused
 sub layout_ui {
-    my $win_main    = $ui->getobj('win_main');
-    my $win_current = $ui->getobj('win_current');
-    my $win_history = $ui->getobj('win_history');
+    my $win_main    = $UI->getobj('win_main');
+    my $win_current = $UI->getobj('win_current');
+    my $win_history = $UI->getobj('win_history');
 
     $win_main->layout();
     $win_current->layout();
@@ -206,9 +206,9 @@ sub layout_ui {
 
 # unused
 sub draw_ui {
-    my $win_main    = $ui->getobj('win_main');
-    my $win_current = $ui->getobj('win_current');
-    my $win_history = $ui->getobj('win_history');
+    my $win_main    = $UI->getobj('win_main');
+    my $win_current = $UI->getobj('win_current');
+    my $win_history = $UI->getobj('win_history');
 
     $win_main->draw();
     $win_current->draw();
@@ -222,12 +222,12 @@ sub update_ui {
 }
 
 sub show_about {
-    my $ret = $ui->dialog("Author: SHIE, Li-Yi\nEmail: lyshie\@mx.nthu.edu.tw");
+    my $ret = $UI->dialog("Author: SHIE, Li-Yi\nEmail: lyshie\@mx.nthu.edu.tw");
 }
 
 # timer session
 sub init_poe_timer {
-    $poe_timer = POE::Session->create(
+    $POE_TIMER = POE::Session->create(
         inline_states => {
             _start => sub {
                 $_[KERNEL]->alarm( tick => time() + 1, 0 );
@@ -235,10 +235,10 @@ sub init_poe_timer {
             tick => sub {
                 $_[KERNEL]->alarm( tock => time() + 1, 0 );
                 my $heap =
-                  $poe_kernel->ID_id_to_session( $poe_tailor->ID() )
+                  $poe_kernel->ID_id_to_session( $POE_TAILOR->ID() )
                   ->get_heap();
                 my $label_timer =
-                  $ui->getobj('win_main')->getobj('label_timer');
+                  $UI->getobj('win_main')->getobj('label_timer');
                 $label_timer->text(
                         scalar( localtime(time) )
                       . ' (Update every '
@@ -249,10 +249,10 @@ sub init_poe_timer {
             tock => sub {
                 $_[KERNEL]->alarm( tick => time() + 1, 0 );
                 my $heap =
-                  $poe_kernel->ID_id_to_session( $poe_tailor->ID() )
+                  $poe_kernel->ID_id_to_session( $POE_TAILOR->ID() )
                   ->get_heap();
                 my $label_timer =
-                  $ui->getobj('win_main')->getobj('label_timer');
+                  $UI->getobj('win_main')->getobj('label_timer');
                 $label_timer->text(
                         scalar( localtime(time) )
                       . ' (Update every '
@@ -266,13 +266,13 @@ sub init_poe_timer {
 
 # tail session
 sub init_poe_tailor {
-    $poe_tailor = POE::Session->create(
+    $POE_TAILOR = POE::Session->create(
         inline_states => {
             _start => sub {
                 $_[HEAP]{tailor} = POE::Wheel::FollowTail->new(
                     Filename     => "$PF_LOG_FILE",
                     InputEvent   => 'got_log_line',
-                    PollInterval => $interval,
+                    PollInterval => $INTERVAL,
                 );
             },
             reset => sub {
@@ -281,49 +281,51 @@ sub init_poe_tailor {
                 $_[HEAP]{tailor} = POE::Wheel::FollowTail->new(
                     Filename     => "$PF_LOG_FILE",
                     InputEvent   => 'got_log_line',
-                    PollInterval => $interval,
+                    PollInterval => $INTERVAL,
                     Seek         => $pos,
                 );
             },
             got_log_line => sub {
                 my $listbox_current =
-                  $ui->getobj('win_current')->getobj('listbox_current');
+                  $UI->getobj('win_current')->getobj('listbox_current');
                 my $listbox_history =
-                  $ui->getobj('win_history')->getobj('listbox_history');
+                  $UI->getobj('win_history')->getobj('listbox_history');
 
                 my $line = $_[ARG0];
 
-                shift(@current) if ( @current > 12 );
-                push( @current, $line );
+                shift(@CURRENT) if ( @CURRENT > 12 );
+                push( @CURRENT, $line );
 
                 my $update_history = 0;
                 if ( $line =~ m/unreachable/ ) {
-                    $now++;
-                    push( @history,
-                        scalar( localtime($now) ) . " - Unreachable occurred" );
+                    $NOW++;
+                    push( @HISTORY,
+                        scalar( localtime($NOW) ) . " - Unreachable occurred" );
                     $update_history = 1;
                 }
                 else {
                     if ( $line =~ m/^\[(\d+)\.\d+\]\s.*?\sicmp_seq=(\d+)/ ) {
                         my $c_time = scalar( localtime($1) );
-                        $now = $1;
+                        $NOW = $1;
                         my $cur = $2;
-                        if ( ( $prev != 0 ) && ( ( $cur - $prev ) > 1 ) ) {
-                            push( @history,
-                                "$c_time - $cur <= $prev ($p_time), "
-                                  . ( $cur - $prev ) );
+                        if (   ( $PREV_SEQ != 0 )
+                            && ( ( $cur - $PREV_SEQ ) > 1 ) )
+                        {
+                            push( @HISTORY,
+                                "$c_time - $cur <= $PREV_SEQ ($P_TIME), "
+                                  . ( $cur - $PREV_SEQ ) );
                             $update_history = 1;
                         }
-                        $prev   = $cur;
-                        $p_time = $c_time;
+                        $PREV_SEQ = $cur;
+                        $P_TIME   = $c_time;
                     }
                 }
 
-                $listbox_current->values(@current);
+                $listbox_current->values(@CURRENT);
                 $listbox_current->draw();
 
                 if ($update_history) {
-                    $listbox_history->values( reverse(@history) );
+                    $listbox_history->values( reverse(@HISTORY) );
                     $listbox_history->draw();
                 }
             },
@@ -336,7 +338,7 @@ sub main {
     init_poe_tailor();
     init_poe_timer();
 
-    $ui->mainloop;
+    $UI->mainloop;
     exit(0);
 }
 
