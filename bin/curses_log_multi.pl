@@ -54,7 +54,8 @@ my $WHO_FOCUS =
   'win_current';          # change focus between 'win_current' and 'win_history'
 
 sub get_multi_hosts {
-    my $cmd = `ps aux | grep ping | grep '\\-D' |awk '{print \$13}' | xargs`;
+    #my $cmd = `ps aux | grep ping | grep '\\-D' |awk '{print \$13}' | xargs`;
+    my $cmd = `ps aux | grep ping | awk '{print \$13}' | xargs`;
 
     my %hosts = ();
     foreach my $item ( split( qr/\s+/, $cmd ) ) {
