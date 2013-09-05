@@ -6,6 +6,6 @@ PERIOD=$3
 
 while [ 1 ]
 do
-    echo $(date +"[%s]") $(tcping "$HOST" "$PORT")
+    echo $(date +"[%s]") $(tcping -t "$PERIOD" "$HOST" "$PORT")
     sleep $PERIOD
 done
