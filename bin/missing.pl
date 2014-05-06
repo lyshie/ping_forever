@@ -30,12 +30,16 @@ my $PF_PATH     = dirname($RealBin);
 my $PF_LOG_PATH = "$PF_PATH/log";
 my $PF_LOG_FILE = "$PF_LOG_PATH/$HASHED.log";
 
-my $prev   = 0;
+my $prev   = 999_999_999;
 my $p_time = 0;
 
 open( FH, "<", $PF_LOG_FILE ) or die("ERROR: Can't open $PF_LOG_FILE");
 while (<FH>) {
-    if (m/^\[(\d+)\.\d+\]\s.*?\sicmp_seq=(\d+)/) {
+    if (m/^PING/) {
+        $prev   = 999_999_999;
+        $p_time = 0;
+    }
+    elsif (m/^\[(\d+)\.\d+\]\s.*?\sicmp_seq=(\d+)/) {
         my $c_time = scalar( localtime($1) );
         my $cur    = $2;
         if ( ( $cur - $prev ) > 1 ) {
